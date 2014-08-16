@@ -34,7 +34,7 @@ setnames(total.steps, 1:2, c("DATE", "TS"))
 
 p.total <- ggplot(total.steps, aes(TS))
 p.total <- p.total + geom_histogram(color = "bisque4", fill="bisque3") 
-p.total <- p.total + labs(title="Total of total steps by day") 
+p.total <- p.total + labs(title="Total steps by day") 
 p.total <- p.total + xlab("Total") + ylab("Frequency")
 print(p.total)
 ```
@@ -106,7 +106,7 @@ print(sum(is.na(monitor)))
 
 **2. Strategy for missing values**
 
-The criterion used to impute missing steps values is calculete the mean among each interrval before removing NA's. After that each steps in original dataset with NA is change by the average of that interval.
+The criterion used to impute missing steps values is to calculate the mean among each interval before removing NA's. After that, each steps in original dataset with NA is substituted by the average of the matching interval.
 
 
 **3. Impute NA's**
@@ -129,7 +129,7 @@ total.steps2 <- monitor2[ , sum(steps), by = date]
 ```r
 p.total2 <- ggplot(total.steps2, aes(V1))
 p.total2 <- p.total2 + geom_histogram(color = "bisque4", fill="bisque3") 
-p.total2 <- p.total2 + labs(title="Total of total steps by day") 
+p.total2 <- p.total2 + labs(title="Total steps by day (NA's imputed)") 
 p.total2 <- p.total2 + xlab("Total") + ylab("Frequency")
 print(p.total2)
 ```
@@ -150,12 +150,8 @@ print(meanmedian.steps2)
 ## 1: 10766  10766
 ```
 
-```r
-# print(total.steps2$V1-total.steps$TS)
-```
-
 - Mean reminds similar but median chango sligthly.
-- Total daily steps increased after imputeing NA's.
+- As na's are imputed by mean on the interval, it's expected that daily steps  increase.
 
 
 ### Differences in activity patterns between weekdays and weekends
@@ -168,7 +164,7 @@ monitor2 <- monitor2[, weekend := format(date, "%a") == "Sat" | format(date, "%a
 ```
 
 
-**2. Panel graphic for weekday and weekend average of stpeps by interval**
+**2. Panel graphic for weekday and weekend average of steps by interval**
 
 
 ```r
