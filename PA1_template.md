@@ -8,14 +8,16 @@ output: html_document
 In this part of the project table activity.csv is loaded into a data frame. Variable date changed to Date format.
 
 **1. Load dataset**
-```{r managedata, echo=TRUE}
+
+```r
 library(data.table)
 setwd("~/Documents/teach/math/DataScience/ReproducibleResearch/PA1/")
 monitor <- as.data.table(read.csv("activity.csv", sep=","))
 ```
 
 **2. Transform require data**
-```{r transformdata, echo=TRUE}
+
+```r
 monitor <- transform(monitor, date = as.Date(date))
 monitor <- transform(monitor, steps = as.numeric(steps))
 ```
@@ -24,7 +26,8 @@ monitor <- transform(monitor, steps = as.numeric(steps))
 
 **1. NA's are removed and total steps grouped by day is calculated. Histogram is drawed using ggplot library**
 
-```{r stepsbyday, echo=TRUE}
+
+```r
 library(ggplot2)
 total.steps <- monitor[!is.na(steps), sum(steps), by = date]
 setnames(total.steps, 1:2, c("DATE", "TS"))
@@ -36,12 +39,24 @@ p.total <- p.total + xlab("Total") + ylab("Frequency")
 print(p.total)
 ```
 
+```
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+```
+
+![plot of chunk stepsbyday](figure/stepsbyday.png) 
+
 
 **2. Mean and median of total steps by day**
 
-```{r meanmedian, echo=TRUE}
+
+```r
 meanmedian.steps <- total.steps[ , list(MEAN = mean(TS), MEDIAN = median(TS))]
 print(meanmedian.steps)
+```
+
+```
+##     MEAN MEDIAN
+## 1: 10766  10765
 ```
 
 
@@ -49,7 +64,8 @@ print(meanmedian.steps)
 
 **1. Time series plot for each 5 minutes interval**
 
-```{r intervalsteps, echo=TRUE}
+
+```r
 interval.steps <- monitor[!is.na(steps), mean(steps), by = interval]
 setnames(interval.steps, 1:2, c("INT", "MS"))
 
@@ -60,10 +76,18 @@ p.interval <- p.interval + xlab("Interval") + ylab("Average")
 print(p.interval)
 ```
 
+![plot of chunk intervalsteps](figure/intervalsteps.png) 
+
 **2. Interval of maximum steps average**
 
-```{r maxinterval, echo=TRUE}
+
+```r
 print(interval.steps[MS == max(interval.steps$MS)])
+```
+
+```
+##    INT    MS
+## 1: 835 206.2
 ```
 
 
@@ -71,8 +95,13 @@ print(interval.steps[MS == max(interval.steps$MS)])
 
 **1. Total number of missing values in the dataset**
 
-```{r missingdata, echo=TRUE}
+
+```r
 print(sum(is.na(monitor)))
+```
+
+```
+## [1] 2304
 ```
 
 **2. Strategy for missing values**
@@ -82,7 +111,8 @@ The criterion used to impute missing steps values is calculete the mean among ea
 
 **3. Impute NA's**
 
-```{r imputingnas, echo=TRUE}
+
+```r
 setnames(interval.steps, 1:2, c("interval", "mean"))
 setkey(interval.steps, interval);
 setkey(monitor, interval)
@@ -95,16 +125,32 @@ total.steps2 <- monitor2[ , sum(steps), by = date]
 
 **4. Mean and median of total steps by day**
 
-```{r meanmedian2, echo=TRUE}
+
+```r
 p.total2 <- ggplot(total.steps2, aes(V1))
 p.total2 <- p.total2 + geom_histogram(color = "bisque4", fill="bisque3") 
 p.total2 <- p.total2 + labs(title="Total of total steps by day") 
 p.total2 <- p.total2 + xlab("Total") + ylab("Frequency")
 print(p.total2)
+```
 
+```
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+```
+
+![plot of chunk meanmedian2](figure/meanmedian2.png) 
+
+```r
 meanmedian.steps2 <- total.steps2[ , list(MEAN = mean(V1), MEDIAN = median(V1))]
 print(meanmedian.steps2)
+```
 
+```
+##     MEAN MEDIAN
+## 1: 10766  10766
+```
+
+```r
 # print(total.steps2$V1-total.steps$TS)
 ```
 
@@ -115,7 +161,8 @@ print(meanmedian.steps2)
 ### Differences in activity patterns between weekdays and weekends
 
 **1. Create factors "weekday" and "weekend"**
-```{r weekends, echo=TRUE}
+
+```r
 monitor2 <- monitor2[, weekday := format(date, "%a") != "Sat" & format(date, "%a") != "Sun"]
 monitor2 <- monitor2[, weekend := format(date, "%a") == "Sat" | format(date, "%a") == "Sun"]
 ```
@@ -123,7 +170,8 @@ monitor2 <- monitor2[, weekend := format(date, "%a") == "Sat" | format(date, "%a
 
 **2. Panel graphic for weekday and weekend average of stpeps by interval**
 
-```{r weekdayavg, echo=TRUE}
+
+```r
 library(lattice)
 interval.steps.wky <- monitor2[as.numeric(weekday) == 1, mean(steps), by = interval]
 interval.steps.wkd <- monitor2[as.numeric(weekend) == 1, mean(steps), by = interval]
@@ -137,3 +185,5 @@ g <- g + geom_line() + facet_grid(weekday ~.)
 g <- g + ylab("Average number of steps")
 print(g)
 ```
+
+![plot of chunk weekdayavg](figure/weekdayavg.png) 
